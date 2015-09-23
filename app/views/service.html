@@ -1,0 +1,173 @@
+<div class="inmodal" ng-show="service">
+    <div class="modal-header">
+        <i class="fa fa-service modal-icon"></i>
+        <h4 class="modal-title">{{service.brand}} {{service.model}} {{service.color}}</h4>
+        <small class="font-bold">{{service.cod | uppercase}}</small>
+    </div>
+    <div class="modal-body">
+
+        <div class="full-height-scroll" full-scroll>
+            <ul class="list-group clear-list">
+                <li class="list-group-item fist-item">
+                    Proprietário
+                    <span class="pull-right"> {{service.customer.name}} </span>
+                </li>
+                <li class="list-group-item">
+                    Telefone
+                    <span class="pull-right"> {{service.customer.phone}} </span>
+                </li>
+                <li class="list-group-item">
+                    Marca
+                    <span class="pull-right"> {{service.brand}} </span>
+                </li>
+                <li class="list-group-item">
+                    Modelo
+                    <span class="pull-right"> {{service.model}} </span>
+                </li>
+                <li class="list-group-item">
+                    Cor
+                    <span class="pull-right"> {{service.color}} </span>
+                </li>
+                <li class="list-group-item">
+                    Ano
+                    <span class="pull-right"> {{service.year}} </span>
+                </li>
+                <li class="list-group-item">
+                    Placa
+                    <span class="pull-right"> {{service.cod | uppercase}} </span>
+                </li>
+                <li class="list-group-item">
+                    Cadastrado em
+                    <span class="pull-right"> {{service.created_at | date}} </span>
+                </li>
+                <li class="list-group-item">
+                    Última alteração
+                    <span class="pull-right"> {{service.updated_at | date}} </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-white" ng-click="closeModal()">Fechar</button>
+        <a ng-click="destroy(current_index)" class="btn btn-warning">Excluír</a>  
+        <a ng-click="edit(current_index)" class="btn btn-success">Editar</a>
+    </div>
+</div>
+
+<div class="inmodal" ng-show="!service">
+    <form class="form-horizontal" ng-submit="create()">
+        <div class="modal-header">
+            <i class="fa fa-service modal-icon"></i>
+            <h2 ng-hide="service_form.id">Cadastre um novo serviço</h2>
+            <h2 ng-show="service_form.id">Editando dados do serviço</h2>
+            <small class="font-bold">* dados obrigatórios</small>
+        </div>
+        <div class="modal-body">
+
+            <div ng-hide="service_form.car_attributes.customer_attributes">
+                <div class="form-group"><label class="col-lg-2 control-label">Proprietário</label>
+                    <div class="col-lg-10">
+                        <ui-select ng-model="service_form.car_attributes.customer_id" theme="bootstrap">
+                            <ui-select-match placeholder="Selecione o proprietário do serviço">{{$select.selected.name}}</ui-select-match>
+                            <ui-select-choices repeat="item.id as item in customers | filter: $select.search">
+                                <div ng-bind-html="item.name">{{item.name}}</div>
+                            </ui-select-choices>
+                        </ui-select>
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.errors.service_id">{{error}}<br/></small>
+                        <br />
+                        <div class="text-right">
+                            <a class="btn btn-xs btn-primary" ng-click="service_form.car_attributes.customer_attributes = {}; service_form.car_attributes.customer_id = undefined">Cadastrar proprietário</a>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            <div ng-show="service_form.car_attributes.customer_attributes">
+                <h5 class="text-center">Dados do proprietário</h5>
+                <div class="form-group"><label class="col-lg-2 control-label">Nome*</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Nome" class="form-control" ng-model="service_form.car_attributes.customer_attributes.name">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.customer.errors.name">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">Telefone*</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Telefone" class="form-control" ng-model="service_form.car_attributes.customer_attributes.phone" data-mask="(99) 9999-9999?9">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.customer.errors.phone">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">E-mail</label>
+                    <div class="col-lg-10">
+                        <input type="email" placeholder="E-mail" class="form-control" ng-model="service_form.car_attributes.customer_attributes.email">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.customer.errors.email">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">Endereço</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Endereço" class="form-control" ng-model="service_form.car_attributes.customer_attributes.address">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.customer.errors.address">{{error}}<br/></small>
+                    </div>
+                </div>
+
+            </div>  
+            <div ng-show="service_form.car_attributes.customer_id || (service_form.car_attributes.customer_attributes.name && service_form.car_attributes.customer_attributes.phone)">
+                <div ng-show="cars.length && !service_form.car_attributes ">
+                    <div class="form-group"><label class="col-lg-2 control-label">Carro</label>
+                        <div class="col-lg-10">
+                            <div class="radio" ng-repeat="car in cars">
+                                <input type="radio" id="car_{{car.id}}" value="{{car.id}}" aria-label="{car}" ng-model="service_form.car_id" >
+                                <label for="car_{{car.id}}">{{car.brand}} {{car.model}} {{car.color}}</label>
+                            </div>
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.errors.service_id">{{error}}<br/></small>
+                            <br />
+                            <div class="text-right">
+                                <a class="btn btn-xs btn-primary" ng-click="service_form.car_attributes = {}; service_form.car_id = undefined">Cadastrar carro</a>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="service_form.car_attributes || !cars.length">
+                    <h5 class="text-center">Dados do carro</h5>
+                    <div class="form-group"><label class="col-lg-2 control-label">Marca*</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" ng-model="service_form.car_attributes.brand">
+                            <small class="help-block m-b-none">Ex: Fiat<br/></small>
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.car_attributes.errors.brand">{{error}}<br/></small>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="col-lg-2 control-label">Modelo*</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" ng-model="service_form.car_attributes.model">
+                            <small class="help-block m-b-none">Ex: Uno<br/></small>
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.car_attributes.errors.model">{{error}}<br/></small>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="col-lg-2 control-label">Cor*</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" ng-model="service_form.car_attributes.color">
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.car_attributes.errors.color">{{error}}<br/></small>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="col-lg-2 control-label">Placa</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" ng-model="service_form.car_attributes.cod" data-mask="aaa-9999">
+                            <small class="help-block m-b-none">Ex: AAA-9999<br/></small>
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.car_attributes.errors.cod">{{error}}<br/></small>
+                        </div>
+                    </div>
+                    <div class="form-group"><label class="col-lg-2 control-label">Ano</label>
+                        <div class="col-lg-10">
+                            <input type="text" class="form-control" ng-model="service_form.car_attributes.year" data-mask="99/99">
+                            <small class="help-block m-b-none">Ex: 14/15<br/></small>
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.car_attributes.errors.year">{{error}}<br/></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>      
+        <div class="modal-footer">
+            <button type="button" class="btn btn-white" ng-click="closeModal()">Fechar</button>
+            <a ng-show="service_form.id" ng-click="destroy(current_index)" class="btn btn-warning">Excluír</a>
+            <button ng-hide="service_form.id" class="btn btn-primary" type="submit" >Cadastrar serviço</button>
+        </div>
+    </form> 
+</div>

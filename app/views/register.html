@@ -1,0 +1,29 @@
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+        <h2 class="logo-name">Oficina App</h2>
+        <p>Preencha seus dados abaixo para cadastrar.</p>
+        <form class="m-t" role="form" ng-submit="submit()" ng-controller="RegisterCtrl">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Nome" ng-model="user.name" required="">
+                <small class="text-danger" ng-repeat="error in user.errors.name">{{error}}<br/></small>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" placeholder="E-mail" ng-model="user.email" required="">
+                <small class="text-danger" ng-repeat="error in user.errors.email">{{error}}<br/></small>
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="Senha" ng-model="user.password" required="">
+                <small class="text-danger" ng-repeat="error in user.errors.password">{{error}}<br/></small>
+            </div>
+            <div class="form-group">
+                <div class="checkbox i-checks"><label> <input type="checkbox" ng-model="user.accept_terms" required=""><i></i> Concordo com os termos e condições </label></div>
+                <small class="text-danger" ng-repeat="error in user.errors.accept_terms">{{error}}<br/></small>
+            </div>
+            <button type="submit" class="btn btn-primary block full-width m-b">Cadastrar</button>
+
+            <p class="text-muted text-center"><small>Já possúi uma conta?</small></p>
+            <a class="btn btn-sm btn-white btn-block" ui-sref="signin">Entrar</a>
+        </form>
+        <p class="m-t"> <small><strong>Oficina App</strong> foi desenvolvido por <strong>Moinho Digital</strong> &copy; 2014</small> </p>
+    </div>
+</div>

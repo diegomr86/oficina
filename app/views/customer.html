@@ -1,0 +1,86 @@
+<div class="inmodal" ng-show="customer">
+    <div class="modal-header">
+        <i class="fa fa-user modal-icon"></i>
+        <h4 class="modal-title">{{customer.name}}</h4>
+        <small class="font-bold">{{customer.phone}}</small>
+    </div>
+    <div class="modal-body">
+        <div class="full-height-scroll" full-scroll>
+            <ul class="list-group clear-list">
+                <li class="list-group-item fist-item">
+                    Nome
+                    <span class="pull-right"> {{customer.name}} </span>
+                </li>
+                <li class="list-group-item">
+                    Telefone
+                    <span class="pull-right"> {{customer.phone}} </span>
+                </li>
+                <li class="list-group-item">
+                    E-mail
+                    <span class="pull-right"> {{customer.email}} </span>
+                </li>
+                <li class="list-group-item">
+                    Endereço
+                    <span class="pull-right"> {{customer.address}} </span>
+                </li>
+                <li class="list-group-item">
+                    Cadastrado em
+                    <span class="pull-right"> {{customer.created_at | date}} </span>
+                </li>
+                <li class="list-group-item">
+                    Última alteração
+                    <span class="pull-right"> {{customer.updated_at | date}} </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-white" ng-click="closeModal()">Fechar</button>
+        <a ng-click="edit(current_index)" class="btn btn-success">Editar</a>
+        <a ng-click="destroy(current_index)" class="btn btn-warning">Excluír</a>  
+    </div>
+</div>
+
+<div class="inmodal" ng-show="!customer">
+    <form class="form-horizontal" ng-submit="customer_form.id ? update() : create()">
+        <div class="modal-header">
+            <i class="fa fa-user modal-icon"></i>
+
+            <h4 class="modal-title" ng-hide="customer_form.id">Cadastre um novo cliente</h4>
+            <h4 class="modal-title" ng-show="customer_form.id">Editando dados do cliente</h4>
+            <small class="font-bold">* dados obrigatórios</small>
+        </div>
+        <div class="modal-body">
+            
+            <div class="form-group"><label class="col-lg-2 control-label">Nome*</label>
+                <div class="col-lg-10">
+                    <input type="text" placeholder="Nome" class="form-control" ng-model="customer_form.name" required="">
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in customer_form.errors.name">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Telefone*</label>
+                <div class="col-lg-10">
+                    <input type="text" placeholder="Telefone" class="form-control" ng-model="customer_form.phone" data-mask="(99) 9999-9999?9">
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in customer_form.errors.phone">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">E-mail</label>
+                <div class="col-lg-10">
+                    <input type="email" placeholder="E-mail" class="form-control" ng-model="customer_form.email">
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in customer_form.errors.email">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Endereço</label>
+                <div class="col-lg-10">
+                    <input type="text" placeholder="Endereço" class="form-control" ng-model="customer_form.address">
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in customer_form.errors.address">{{error}}<br/></small>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-white" ng-click="closeModal()">Fechar</button>
+            <a ng-show="customer_form.id" ng-click="destroy(current_index)" class="btn btn-warning">Excluír</a>
+            <button class="btn btn-primary" type="submit" >Salvar</button>
+        </div>
+    </form> 
+</div>
