@@ -12,9 +12,9 @@ function pageTitle($rootScope, $timeout) {
         link: function(scope, element) {
             var listener = function(event, toState, toParams, fromState, fromParams) {
                 // Default title - load on Dashboard 1
-                var title = 'INSPINIA | Responsive Admin Theme';
+                var title = 'Oficina App | Software para oficinas';
                 // Create your own title pattern
-                if (toState.data && toState.data.pageTitle) title = 'INSPINIA | ' + toState.data.pageTitle;
+                if (toState.data && toState.data.pageTitle) title = 'Oficina App | ' + toState.data.pageTitle;
                 $timeout(function() {
                     element.text(title);
                 });
@@ -147,7 +147,43 @@ function iboxToolsFullScreen($timeout) {
     };
 }
 
+/**
+ * icheck - Directive for custom checkbox icheck
+ */
+function icheck($timeout) {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function($scope, element, $attrs, ngModel) {
+            return $timeout(function() {
+                console.log('xssdfasdfasdf')
+                var value;
+                value = $attrs['value'];
 
+                $scope.$watch($attrs['ngModel'], function(newValue){
+                    $(element).iCheck('update');
+                })
+
+                return $(element).iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    radioClass: 'iradio_square-green'
+
+                }).on('ifChanged', function(event) {
+                        if ($(element).attr('type') === 'checkbox' && $attrs['ngModel']) {
+                            $scope.$apply(function() {
+                                return ngModel.$setViewValue(event.target.checked);
+                            });
+                        }
+                        if ($(element).attr('type') === 'radio' && $attrs['ngModel']) {
+                            return $scope.$apply(function() {
+                                return ngModel.$setViewValue(value);
+                            });
+                        }
+                    });
+            });
+        }
+    };
+}
 
 /**
  *
@@ -159,4 +195,5 @@ angular
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
-    .directive('iboxToolsFullScreen', iboxToolsFullScreen);
+    .directive('iboxToolsFullScreen', iboxToolsFullScreen)
+    .directive('icheck', icheck);

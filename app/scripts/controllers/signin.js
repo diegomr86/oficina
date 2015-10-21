@@ -7,7 +7,7 @@ function SigninCtrl($scope, $auth, $state) {
         .then(function(resp) {
           console.log('then')
           console.log(resp)
-          $state.go('dashboard.index')
+          $state.go('dashboard.cars')
         })
         .catch(function(resp) {
           console.log('catch')

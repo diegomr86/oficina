@@ -13,7 +13,7 @@ function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
         emailRegistrationPath:   '/auth.json'
     });
 
-    $urlRouterProvider.otherwise("/dashboard");
+    $urlRouterProvider.otherwise("/dashboard/cars");
     $stateProvider
         .state('index', {
             url: "/index",
@@ -47,6 +47,12 @@ function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
               }
             }
         })
+        .state('print_estimate', {
+            url: '/print_estimate/:id',
+            templateUrl: 'views/print_estimate.html',
+            controller: 'PrintEstimateCtrl',
+            pageTitle: 'Orçamento'
+        })
         .state('dashboard.index', {
             url: '',
             templateUrl: 'views/dashboard.html'            
@@ -60,7 +66,13 @@ function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
         .state('dashboard.cars', {
             url: '/cars',
             templateUrl: 'views/cars.html',
-            controller: 'CarsCtrl'
+            controller: 'CarsCtrl',
+            pageTitle: 'Carros'
+        })
+        .state('dashboard.car', {
+            url: '/cars/:id',
+            templateUrl: 'views/car.html',
+            controller: 'CarCtrl'
         })
         .state('dashboard.services', {
             url: '/services',
@@ -70,7 +82,17 @@ function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
 }
 angular
     .module('inspinia')
-    .constant('Config', { apiUrl: 'http://localhost:3000' })
+    .constant('Config', { 
+        // apiUrl: 'http://localhost:3000',
+        apiUrl: 'http://oficina-api.herokuapp.com',
+        service_type_list: { 
+            manutencao: { description: 'Manutenção', class: 'primary' },
+            polimento: { description: 'Polimento', class: 'info' },
+            pintura: { description: 'Pintura', class: 'success' },
+            solda: { description: 'Solda', class: 'warning' },
+            lanternagem: { description: 'Lanternagem', class: 'danger' }
+        }
+    })
     .config(config)
     .run(function($rootScope, $state) {
         // $rootScope.$on('auth:validation-error', function(ev) {

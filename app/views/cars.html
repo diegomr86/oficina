@@ -1,65 +1,312 @@
-<div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>Carros</h2>
-        <ol class="breadcrumb">
-            <li>
-                <a ui-sref="dashboard.index">Dashboard</a>
-            </li>
-            <li class="active">
-                <strong>Carros</strong>
-            </li>
-        </ol>
+<div ng-hide="car || car_form">
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-xs-9">
+            <h2 class="">Carros</h2>
+<!--             <ol class="breadcrumb">
+                <li>
+                    <a ui-sref="dashboard.index">Dashboard</a>
+                </li>
+                <li class="active">
+                    <strong>Carros</strong>
+                </li>
+            </ol> -->
+        </div>
+        <div class="col-xs-3 text-right">
+            <h2 class="no-margin-bottom"><a ng-click="new()" class="btn btn-small btn-primary"><i class="fa fa-plus"></i></a></h2>
+        </div>
     </div>
-    <div class="col-lg-2 text-right">
-        <h2><a ng-click="new()" class="btn btn-small btn-primary">Cadastrar carro</a></h2>
+    <div class="row border-bottom white-bg dashboard-header animated fadeInRight">
+        <form ng-submit="filter()">
+            <div class="input-group m-b-sm m-t-sm">
+                <input type="text" placeholder="Buscar carro" class="input form-control" ng-model="filter_form.search">
+                <span class="input-group-btn">
+                        <button type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i></button>
+                </span>
+            </div>
+        </form>
+        <div class="project-list">
+            <table class="table table-hover">
+                <tbody>
+                    <tr ng-repeat="car in cars" >
+                        <td class="project-status">
+                            <pie-chart data="[(car.services | filter:{checked:true}).length + (car.materials | filter:{checked:true}).length, (car.services.length - (car.services | filter:{checked:true}).length) + (car.materials.length - (car.materials | filter:{checked:true}).length)]" options="PieChart5.options"></pie-chart>
+                        </td>
+                        <td class="project-title" ng-click="show($index)">
+                            {{car.brand}} {{car.model}} {{car.color}}
+                            <br/>
+                            <small>{{car.customer.name}}</small>
+                        </td>
+                        <td>{{car.cod | uppercase}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-hide="cars.length">
+                <h4 class="text-center">Nenhum carro cadastrado</h4>
+                <br />
+                <a ng-click="new()" class="btn btn-small btn-primary btn-block">Cadastre o primeiro</a>
+            </div>
+        </div>
     </div>
-</div>
-<div class="wrapper wrapper-content  animated fadeInRight">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="ibox">
-                <div class="ibox-content">
-                    <h2>Carros</h2>
-                    <p>
-                        Use o campo abaixo para pesquisar carros 
-                    </p>
-                    <form ng-submit="filter()">
+</div>  
+<div ng-show="car">
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-xs-10">
+            <h2><i class="fa fa-car"></i> {{car.model}} {{car.color}}</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a ng-click="list()">Carros</a>
+                </li>
+                <li class="active">
+                    <strong>{{car.cod}}</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-xs-2 text-right">
+            <h2><a ng-click="new()" class="btn btn-small btn-primary"><i class="fa fa-plus"></i></a></h2>
+        </div>
+    </div>
+    <div class="row border-bottom white-bg dashboard-header animated fadeInRight">
+        <div class="btn-group btn-group-justified border-bottom">
+            <a class="btn btn-outline btn-primary btn-sm" ng-class="{'active' : (car_view == 'servicos')}" ng-click="car_view = 'servicos'"><i class="fa fa-wrench"></i> Serviços</a>
+            <a class="btn btn-outline btn-primary btn-sm" ng-class="{'active' : (car_view == 'materiais')}" ng-click="car_view = 'materiais'"><i class="fa fa-puzzle-piece"></i> Materiais</a>
+            <a class="btn btn-outline btn-primary btn-sm" ng-class="{'active' : (car_view == 'info')}" ng-click="car_view = 'info'"><i class="fa fa-info"></i> Info</a>
+        </div>
+        <br />
+        <div ng-show="car_view == 'servicos'">
+            <h4 class="text-center" ng-hide="car.services.length">Nenhum serviço cadastrado</h4>
+            <ul ui-sortable="sortableOptions" class="sortable-list connectList agile-list" ng-model="car.services">
+                <li class="{{service_type_list[service.service_type].class}}-element" ng-repeat="service in car.services">
+                    <div class="row">
+                        <div class="col-xs-8"> 
+                            <strong>{{service.description || service_type_list[service.service_type].description}}</strong>
+                            <br />
+                            <small>{{service.value | currency}}</small>
+                        </div>
+                        <div class="col-xs-4 text-right"> <input icheck type="checkbox" ng-model="service.checked" style="margin-top: 7px" ng-change="alert($index)" /></div>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-horizontal" ng-submit="create_service()">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Adicionar: </label>
+                    <div class="col-sm-10 float-e-margins">
+                        <span ng-repeat="(service_key, service_type) in service_type_list">
+                            <a class="btn btn-outline btn-sm btn-{{service_type.class}}" ng-click="service_form.service_type = service_key" ng-class="{'active' : (service_form.service_type == service_key)}">{{service_type.description}}</a>
+                        </span> 
+                    </div>
+                </div>
+                <div ng-show="service_form.service_type">
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <input type="text" placeholder="Insira a descrição (Opicional)" class="form-control" ng-model="service_form.description">
+                            <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.errors.description">{{error}}<br/></small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" ng-model="service_form.value" placeholder="$ 0.00" ui-money-mask autofocus />
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary"> <i class="fa fa-save"></i> Salvar</button>
+                                </span>
+                            </div>  
+                        </div>
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in service_form.errors.description">{{error}}<br/></small>
+                    </div>
+                </div>  
+            </form>
+        </div>
+        <div ng-show="car_view == 'materiais'">
+            <h4 class="text-center" ng-hide="car.materials.length">Nenhum material cadastrado</h4>
+            <ul ui-sortable="sortableOptions" class="sortable-list connectList agile-list" ng-model="car.materials">
+                <li class="primary-element" ng-repeat="material in car.materials">
+                    <div class="row">
+                        <div class="col-xs-8"> 
+                            <strong>{{material.description}}</strong>
+                            <br />
+                            <small>{{material.value | currency}}</small>
+                        </div>
+                        <div class="col-xs-4 text-right"> <input icheck type="checkbox" ng-model="material.checked" style="margin-top: 7px" ng-change="alert($index)" /></div>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-horizontal" ng-submit="create_material()">
+                <h4>Cadastrar material:</h4>
+                <div class="form-group">
+                    <div class="col-lg-12">
+                        <input type="text" placeholder="Insira o nome do material" class="form-control" ng-model="material_form.description" />
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in material_form.errors.description">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-12">
                         <div class="input-group">
-                            <input type="text" placeholder="Buscar carro" class="input form-control" ng-model="filter_form.search">
-                                    <span class="input-group-btn">
-                                            <button type="submit" class="btn btn btn-primary"> <i class="fa fa-search"></i> Buscar</button>
-                                    </span>
-                        </div>
-                    </form>
-                    <div class="clients-list">
-                        <div class="tab-content">
-                            <div id="tab-1" class="tab-pane active">
-                                <div class="full-height-scroll" full-scroll>
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover">
-                                            <tbody>
-                                                <tr ng-repeat="car in cars">
-                                                    <td class="contact-type"><i class="fa fa-car"> </i></td>
-                                                    <td><a ng-click="show($index)" class="client-link">{{car.brand}} {{car.model}} {{car.color}}</a></td>
-                                                    <td class="contact-type"><i class="fa fa-keyboard-o"> </i></td>
-                                                    <td>{{car.cod | uppercase}}</td>
-                                                    <td></td>
-                                                    <td class="client-status">
-                                                        <a ng-click="show($index)" class="label label-primary"><i class="fa fa-eye"></i></a>
-                                                        <a ng-click="edit($index)" class="label label-success"><i class="fa fa-edit"></i></a>
-                                                        <a ng-click="destroy($index)" class="label label-warning"><i class="fa fa-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <h3 class="text-center" ng-hide="cars.length">Nenhum carro encontrado</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            <input type="text" class="form-control" ng-model="material_form.value" placeholder="$ 0.00" ui-money-mask autofocus />
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary"> <i class="fa fa-save"></i> Salvar</button>
+                            </span>
+                        </div>  
+                    </div>
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in material_form.errors.description">{{error}}<br/></small>
+                </div>  
+            </form> 
+        </div>
+        <div ng-show="car_view == 'info'">
+            <ul class="list-group clear-list">
+                <li class="list-group-item fist-item">
+                    Proprietário
+                    <span class="pull-right"> {{car.customer.name}} </span>
+                </li>
+                <li class="list-group-item">
+                    Telefone
+                    <span class="pull-right"> {{car.customer.phone}} </span>
+                </li>
+                <li class="list-group-item">
+                    Marca
+                    <span class="pull-right"> {{car.brand}} </span>
+                </li>
+                <li class="list-group-item">
+                    Modelo
+                    <span class="pull-right"> {{car.model}} </span>
+                </li>
+                <li class="list-group-item">
+                    Cor
+                    <span class="pull-right"> {{car.color}} </span>
+                </li>
+                <li class="list-group-item">
+                    Ano
+                    <span class="pull-right"> {{car.year}} </span>
+                </li>
+                <li class="list-group-item">
+                    Placa
+                    <span class="pull-right"> {{car.cod | uppercase}} </span>
+                </li>
+                <li class="list-group-item">
+                    Cadastrado em
+                    <span class="pull-right"> {{car.created_at | date}} </span>
+                </li>
+                <li class="list-group-item">
+                    Última alteração
+                    <span class="pull-right"> {{car.updated_at | date}} </span>
+                </li>
+            </ul>
+            <div class="modal-footer">
+                <a ng-click="destroy(current_index)" class="btn btn-outline btn-danger">Excluír</a>  
+                <a ng-click="edit(current_index)" class="btn btn-outline btn-primary">Editar</a>
+            </div>
+
+        </div>
+    </div>
+    <div ng-show="car.services.length || car.materials.length ">
+        <a ui-sref="print_estimate({id: car.id})" target="_blank" class="btn btn-small btn-primary btn-block"><i class="fa fa-print"></i> imprimir orçamento</a>
+    </div>  
+</div>
+<div ng-show="car_form">
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-xs-10">
+            <h2 ng-hide="car_form.id"><i class="fa fa-car"></i> Cadastrar</h2>
+            <h2 ng-show="car_form.id"><i class="fa fa-car"></i> {{car.model}} {{car.color}}</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a ng-click="car_form = undefined;">Carros</a>
+                </li>
+                <li class="active">
+                    <strong>{{car_form.cod}}</strong>
+                </li>
+            </ol>
+        </div>
+        <div class="col-xs-2 text-right">
+            <h2><a ng-click="new()" class="btn btn-small btn-primary"><i class="fa fa-plus"></i></a></h2>
+        </div>
+    </div>
+    <div class="row border-bottom white-bg dashboard-header animated fadeInRight">
+        <form class="form-horizontal" ng-submit="car_form.id ? update() : create()">
+            <div ng-hide="car_form.customer_attributes">
+                <div class="form-group"><label class="col-lg-2 control-label">Proprietário</label>
+                    <div class="col-lg-10">
+                        <ui-select ng-model="car_form.customer_id" theme="bootstrap">
+                            <ui-select-match placeholder="Selecione o proprietário do carro">{{$select.selected.name}}</ui-select-match>
+                            <ui-select-choices repeat="item.id as item in customers | filter: $select.search">
+                                <div ng-bind-html="item.name">{{item.name}}</div>
+                            </ui-select-choices>
+                        </ui-select>
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.car_id">{{error}}<br/></small>
+                        <br />
+                        <div class="text-right">
+                            <a class="label label-primary" ng-click="car_form.customer_attributes = {}; car_form.customer_id = undefined">
+                                Cadastrar proprietário
+                            </a>
+                        </div>    
                     </div>
                 </div>
             </div>
-        </div>
+            <div ng-show="car_form.customer_attributes">
+                <h5 class="text-center">Dados do proprietário</h5>
+                <div class="form-group"><label class="col-lg-2 control-label">Nome*</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Nome" class="form-control" ng-model="car_form.customer_attributes.name">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.customer.errors.name">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">Telefone*</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Telefone" class="form-control" ng-model="car_form.customer_attributes.phone" data-mask="(99) 9999-9999?9">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.customer.errors.phone">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">E-mail</label>
+                    <div class="col-lg-10">
+                        <input type="email" placeholder="E-mail" class="form-control" ng-model="car_form.customer_attributes.email">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.customer.errors.email">{{error}}<br/></small>
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-lg-2 control-label">Endereço</label>
+                    <div class="col-lg-10">
+                        <input type="text" placeholder="Endereço" class="form-control" ng-model="car_form.customer_attributes.address">
+                        <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.customer.errors.address">{{error}}<br/></small>
+                    </div>
+                </div>
+
+            </div>  
+            <h5 class="text-center" ng-show="car_form.customer_attributes">Dados do carro</h5>
+            <div class="form-group"><label class="col-lg-2 control-label">Marca*</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" ng-model="car_form.brand" required="">
+                    <small class="help-block m-b-none">Ex: Fiat<br/></small>
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.brand">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Modelo*</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" ng-model="car_form.model" required="">
+                    <small class="help-block m-b-none">Ex: Uno<br/></small>
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.model">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Cor*</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" ng-model="car_form.color" required="">
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.color">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Placa</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" ng-model="car_form.cod" data-mask="aaa-9999">
+                    <small class="help-block m-b-none">Ex: AAA-9999<br/></small>
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.cod">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-lg-2 control-label">Ano</label>
+                <div class="col-lg-10">
+                    <input type="text" class="form-control" ng-model="car_form.year" data-mask="99/99">
+                    <small class="help-block m-b-none">Ex: 14/15<br/></small>
+                    <small class="help-block m-b-none text-danger" ng-repeat="error in car_form.errors.year">{{error}}<br/></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a ng-show="car_form.id" ng-click="destroy(current_index)" class="btn btn-outline btn-danger">Excluír</a>
+                <button class="btn btn-outline btn-primary" type="submit">Salvar</button>
+            </div>
+        </form> 
     </div>
 </div>

@@ -1,0 +1,85 @@
+<style type="text/css">
+  body {
+    height: auto;
+    background: none;
+  }
+</style>
+<div class="white-bg">
+    <div class="ibox-content p-xl">
+        <div class="row">
+            <div class="col-xs-6">
+                <h3>Nossa Senhora Aparecida</h3>
+                <address>
+                    <strong>Auto Lanternagem e Pinturas</strong><br>
+                    Rua São João, N 598, Centro<br>
+                    Posse-GO, CEP 75645-333<br>
+                    <strong>Telefone:</strong> (62) 9633-6330 / 8505-4834
+                </address>
+            </div>
+
+            <div class="col-xs-6 text-right">
+                <h4>Orçamento:</h4>
+                <strong>{{car.brand}} {{car.model}} {{car.color}} {{car.year}}</strong>
+                <br/>
+                <span>{{car.cod | uppercase}}</span>
+                <br>
+                <strong>{{car.customer.name}}</strong>
+                <br>
+                <span>Emitido em: {{car.created_at | date}}</span><br/>
+                
+            </div>
+        </div>
+        <div class="table-responsive m-t">
+            <table class="table invoice-table">
+                <thead>
+                <tr>
+                    <th><h3>Serviços</h3></th>
+                    <th>Valor</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="service in car.services">
+                      <td><div><strong>{{service.description || service_type_list[service.service_type].description}}</strong></div>
+                          <small ng-show="service.description">{{service_type_list[service.service_type].description}}</small></td>
+                      <td>{{service.value | currency}}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-responsive m-t">
+            <table class="table invoice-table">
+                <thead>
+                <tr>
+                    <th><h3>Materiais</h3></th>
+                    <th>Valor</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="material in car.materials">
+                      <td><div><strong>{{material.description}}</strong></div></td>
+                      <td>{{material.value | currency}}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <table class="table invoice-total">
+            <tbody>
+            <tr>
+                <td><strong>Serviços:</strong></td>
+                <td>{{total_services | currency}}</td>
+            </tr>
+            <tr>
+                <td><strong>Materiais:</strong></td>
+                <td>{{total_materials | currency}}</td>
+            </tr>
+            <tr>
+                <td><strong>TOTAL:</strong></td>
+                <td><strong>{{total_services + total_materials | currency}}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+  window.print();
+</script>

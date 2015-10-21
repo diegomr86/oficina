@@ -6,7 +6,7 @@
 /**
  * MainCtrl - controller
  */
-function DashboardCtrl($scope, $auth, $location, notify) {
+function DashboardCtrl($scope, $auth, $location, notify, Config) {
 
     notify.config({ position: 'right'} )
 
@@ -19,6 +19,8 @@ function DashboardCtrl($scope, $auth, $location, notify) {
         });
     }
     console.log("dashboard")
+
+    $scope.service_type_list = Config.service_type_list
 };
 
 

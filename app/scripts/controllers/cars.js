@@ -1,20 +1,15 @@
-function CarsCtrl($http, $scope, $modal, Config, notify, SweetAlert) {
+function CarsCtrl($http, $scope, $rootScope, $modal, Config, notify, SweetAlert, $state) {
 
-var modalInstance = undefined;
 
-  $scope.closeModal = function() {
-    if (modalInstance) {
-      modalInstance.close()
-    }
-  }
+  $rootScope.pageTitle = "asdfasdf"
+  var modalInstance = undefined;
 
-  $scope.openModal = function() {
-    $scope.closeModal()
-    modalInstance = $modal.open({
-      scope: $scope,
-      templateUrl: 'views/car.html'
-    });
-  }
+  $scope.PieChart5 = {
+        data: [226, 134],
+        options: {
+            fill: ["#1ab394", "#d7d7d7"]
+        }
+  };
 
   function load_customers(){
     $http.get(Config.apiUrl + '/customers.json' ).success(function(data){
@@ -22,44 +17,87 @@ var modalInstance = undefined;
     });
   }
 
-  function list() {
+  $scope.list = function(){
     $http.get(Config.apiUrl + '/cars.json', { params: $scope.filter_form } ).success(function(data){
       $scope.cars = data
     });
 
     $scope.car = undefined
-    $scope.car_form = {}
+  }
+
+  $scope.print = function() {
+    $rootScope.print_car = $scope.car
+    $state.go('print_estimate')
   }
 
   $scope.filter = function(){
-    list();
+    $scope.list();
   }
 
+  $scope.$watch('car.services', function(newValue, oldValue) {
+    
+    if (newValue && oldValue) {
+      console.log(newValue)
+      angular.forEach(newValue, function(service, index){
+        if (service.checked != oldValue[index].checked) {
+          $http.put(Config.apiUrl + '/services/'+service.id+'.json', { service: service } ).success(function(data){
+            console.log(data)
+          }).error(function(error){
+            console.log(error)
+          }); 
+
+        }
+
+      });
+    }
+  },true);
+
+  $scope.$watch('car.materials', function(newValue, oldValue) {
+    
+    if (newValue && oldValue) {
+      console.log(newValue)
+      angular.forEach(newValue, function(material, index){
+        if (material.checked != oldValue[index].checked) {
+          $http.put(Config.apiUrl + '/materials/'+material.id+'.json', { material: material } ).success(function(data){
+            console.log(data)
+          }).error(function(error){
+            console.log(error)
+          }); 
+
+        }
+
+      });
+    }
+  },true);
+
+
   $scope.show = function(index){
+    $scope.car_form = undefined
     $scope.car = $scope.cars[index]
     $scope.current_index = index
-    $scope.openModal()
+    $scope.service_form = { car_id: $scope.car.id }
+    $scope.material_form = { car_id: $scope.car.id }
+    $scope.car_view = 'servicos'
   }
 
   $scope.edit = function(index){
     $scope.car = undefined
     $scope.car_form = $scope.cars[index]
+    console.log($scope.car_form)
+
     $scope.current_index = index
-    $scope.openModal()
   }
 
   $scope.new = function(){
     $scope.car = undefined
-    $scope.car_form = {}
-    $scope.openModal()
+    $scope.car_form = { }
   }
 
   $scope.create = function(){
     if ($scope.car_form) {
       $http.post(Config.apiUrl + '/cars.json', { car: $scope.car_form } ).success(function(data){
         $scope.cars.push(data)
-        $scope.car_form = {}
-        $scope.closeModal()
+        $scope.show($scope.cars.length - 1)
         notify({ message: 'Carro cadastrado com sucesso', classes: 'alert-info', position: 'right', templateUrl: 'views/common/notify.html'});
       }).error(function(error){
         $scope.car_form.errors = error
@@ -70,10 +108,8 @@ var modalInstance = undefined;
   $scope.update = function(){
     if ($scope.car_form) {
       $http.put(Config.apiUrl + '/cars/'+$scope.car_form.id+'.json', { car: $scope.car_form } ).success(function(data){
-        $scope.car_form.customer = $scope.car_form.customer_attributes
-        $scope.car = $scope.car_form
-        $scope.car_form = {}
-        $scope.closeModal()
+        $scope.cars[$scope.current_index] = data
+        $scope.show($scope.current_index)
         notify({ message: 'Carro atualizado com sucesso', classes: 'alert-info', position: 'right', templateUrl: 'views/common/notify.html'});
       }).error(function(error){
         $scope.car_form.errors = error
@@ -100,7 +136,6 @@ var modalInstance = undefined;
             $scope.car_form = undefined
             $scope.current_index = undefined
           }
-          $scope.closeModal()
           notify({ message: 'Carro excluído com sucesso', classes: 'alert-info', position: 'right', templateUrl: 'views/common/notify.html'});
         }).error(function(error){
           notify({ message: 'Não foi possível excluir este carro', classes: 'alert-error', position: 'right', templateUrl: 'views/common/notify.html'});
@@ -110,7 +145,33 @@ var modalInstance = undefined;
       
   }
 
-  list();
+  $scope.create_service = function(){
+    console.log('asdfasdfadsf', $scope.service_form)
+
+    if ($scope.service_form) {
+      $http.post(Config.apiUrl + '/services.json', { service: $scope.service_form } ).success(function(data){
+        $scope.car.services.push(data)
+        $scope.service_form = { car_id: $scope.car.id }
+      }).error(function(error){
+        $scope.service_form.errors = error
+      });      
+    }
+  }
+
+  $scope.create_material = function(){
+    console.log('asdfasdfadsf', $scope.material_form)
+
+    if ($scope.material_form) {
+      $http.post(Config.apiUrl + '/materials.json', { material: $scope.material_form } ).success(function(data){
+        $scope.car.materials.push(data)
+        $scope.material_form = { car_id: $scope.car.id }
+      }).error(function(error){
+        $scope.material_form.errors = error
+      });      
+    }
+  }
+
+  $scope.list();
   load_customers();
 
 };

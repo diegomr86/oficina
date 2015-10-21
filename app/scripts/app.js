@@ -9,7 +9,9 @@
         'ng-token-auth',
         'cgNotify',
         'oitozero.ngSweetAlert',
-        'ui.select'
-
+        'ui.select',
+        'ui.utils.masks',
+        'angular-peity',
+        'angular-flot'
     ])
 })();
