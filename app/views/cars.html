@@ -190,6 +190,38 @@
                     <span class="pull-right"> {{car.updated_at | date}} </span>
                 </li>
             </ul>
+            <div>
+                <div class="lightBoxGallery">
+                    <a ng-repeat="picture in car.pictures" href="http://res.cloudinary.com/dsoz5vac0/image/upload/{{picture.public_id}}.jpg" title="Fotos do {{car.brand}} {{car.model}} {{car.color}}" data-gallery="">
+                        <cl-image public-id="{{picture.public_id}}" class="thumbnail inline" format="jpg">
+                            <cl-transformation height="90" width="90" crop="fill"/>
+                        </cl-image>
+
+                    </a>
+                    <span ng-repeat="file in files">
+                        <img ng-src="file.result.url || file" data-gallery="" style="width: 100px; height: 100px; background: url('img/black_bg.png') no-repeat -{{100 - file.progress}}px" class="thumbnail inline" />
+                    </span>
+                    
+                        <!-- The Gallery as lightbox dialog, should be a child element of the document body -->
+                    <div id="blueimp-gallery" class="blueimp-gallery">
+                        <div class="slides"></div>
+                        <h3 class="title"></h3>
+                        <a class="prev">‹</a>
+                        <a class="next">›</a>
+                        <a class="close">×</a>
+                        <a class="play-pause"></a>
+                        <ol class="indicator"></ol>
+                    </div>
+
+                </div>
+                <div id="direct_upload" ngf-drop="uploadFiles($files)" ngf-drag-over-class="dragOverClass($event)" ng-model="files" ng-multiple="true" class="text-center">
+                    <div href="#" class="upload_button btn btn-success" ngf-select="uploadFiles($files)" multiple title="upload" resetOnClick="true" >
+                        <i class="fa fa-upload"></i>Enviar foto
+                    </div>
+                    <br />
+                    <br />
+                </div>
+            </div>
             <div class="modal-footer">
                 <a ng-click="destroy(current_index)" class="btn btn-outline btn-danger">Excluír</a>  
                 <a ng-click="edit(current_index)" class="btn btn-outline btn-primary">Editar</a>
@@ -310,3 +342,15 @@
         </form> 
     </div>
 </div>
+<style>
+    /* Local style for demo purpose */
+
+    .lightBoxGallery {
+        text-align: center;
+    }
+
+    .lightBoxGallery img {
+        margin: 5px;
+    }
+
+</style>

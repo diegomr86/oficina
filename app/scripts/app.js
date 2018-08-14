@@ -12,6 +12,8 @@
         'ui.select',
         'ui.utils.masks',
         'angular-peity',
-        'angular-flot'
+        'angular-flot',
+        'ngFileUpload',
+        'cloudinary'
     ])
 })();

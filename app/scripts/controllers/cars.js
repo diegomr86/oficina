@@ -1,4 +1,4 @@
-function CarsCtrl($http, $scope, $rootScope, $modal, Config, notify, SweetAlert, $state) {
+function CarsCtrl($http, $scope, $rootScope, $modal, Config, notify, SweetAlert, $state, $filter, Upload) {
 
 
   $rootScope.pageTitle = "asdfasdf"
@@ -79,6 +79,48 @@ function CarsCtrl($http, $scope, $rootScope, $modal, Config, notify, SweetAlert,
     $scope.material_form = { car_id: $scope.car.id }
     $scope.car_view = 'servicos'
   }
+
+  $scope.uploadFiles = function(files){
+    console.log(files)
+    $scope.files = files;
+    if (!$scope.files) return;
+    angular.forEach(files, function(file){
+      if (file && !file.$error) {
+        p = {
+          url: "https://api.cloudinary.com/v1_1/" + $.cloudinary.config().cloud_name + "/upload",
+          fields: {
+            upload_preset: $.cloudinary.config().upload_preset,
+            tags: 'myphotoalbum',
+            context: 'photo=' + $scope.car.id
+          },
+          file: file
+        }
+        console.log(p)
+        file.upload = Upload.upload(p).progress(function (e) {
+          file.progress = Math.round((e.loaded * 100.0) / e.total);
+          file.status = "Uploading... " + file.progress + "%";
+          console.log(file)
+        }).success(function (data, status, headers, config) {
+          $rootScope.photos = $rootScope.photos || [];
+          data.context = {custom: {photo: $scope.title}};
+          $scope.files = $filter('filter')($scope.files, {blobUrl: '!'+file.blobUrl})
+          $scope.files = $filter('filter')($scope.files, {blobUrl: '!'+file.blobUrl})
+          console.log($scope.files)
+          $http.post(Config.apiUrl + '/cars/'+$scope.car.id+'/pictures.json', { picture: { public_id: data.public_id } } ).success(function(data){
+            $scope.car.pictures.push(data);
+          }).error(function(error){
+            console.log(error)
+          });
+        }).error(function (data, status, headers, config) {
+          console.log(data)
+          console.log(status)
+          console.log(headers)
+          console.log(config)
+          file.result = data;
+        });
+      }
+    });
+  };
 
   $scope.edit = function(index){
     $scope.car = undefined

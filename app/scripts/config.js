@@ -6,7 +6,14 @@
  * Initial there are written stat for all view in theme.
  *
  */
-function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
+$.cloudinary.config().cloud_name = 'dsoz5vac0';
+$.cloudinary.config().upload_preset = 'ovjrkvfl';
+
+function config($stateProvider, $urlRouterProvider, $authProvider, $httpProvider, Config) {
+
+    // $httpProvider.defaults.headers.common['Access-Control-Allow-Headers'] = '*';
+    delete $httpProvider.defaults.headers.post["If-Modified-Since"]
+    console.log($httpProvider.defaults.headers.post )
 
     $authProvider.configure({
         apiUrl: Config.apiUrl,
@@ -79,6 +86,7 @@ function config($stateProvider, $urlRouterProvider, $authProvider, Config) {
             templateUrl: 'views/services.html',
             controller: 'ServicesCtrl'
         });
+        
 }
 angular
     .module('inspinia')
